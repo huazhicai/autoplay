@@ -1,0 +1,250 @@
+{
+  "cookies": [
+    {
+      "name": "acw_tc",
+      "value": "0a472f8917541175747211189e43e640e6738e85a80232854fe688155c912e",
+      "domain": "puser.zjzwfw.gov.cn",
+      "path": "/",
+      "expires": 1754119374.738,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "None"
+    },
+    {
+      "name": "acw_tc",
+      "value": "0a472f8217541175748503760e3378266ff7234eef29de3c1c1f7c8107541d",
+      "domain": "user.zjzwfw.gov.cn",
+      "path": "/",
+      "expires": 1754119374.874,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "None"
+    },
+    {
+      "name": "webId",
+      "value": "1",
+      "domain": "user.zjzwfw.gov.cn",
+      "path": "/",
+      "expires": 1756709576,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "None"
+    },
+    {
+      "name": "zjzw_siteCode",
+      "value": "330000000000",
+      "domain": "user.zjzwfw.gov.cn",
+      "path": "/",
+      "expires": 1756709576,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "None"
+    },
+    {
+      "name": "aliyungf_tc",
+      "value": "9b10e46be5eda4c2569c1084216690c7488551a218df93ca19fdbf762ae2b047",
+      "domain": "www.zjzwfw.gov.cn",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "None"
+    },
+    {
+      "name": "acw_tc",
+      "value": "ac11000117541175772002938e0ca944321682d9e147da1e868add45fa05c1",
+      "domain": "www.zjzwfw.gov.cn",
+      "path": "/",
+      "expires": 1754119377.278,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "None"
+    },
+    {
+      "name": "_ud_",
+      "value": "5e77c59e0e6648409487ce814006eec3",
+      "domain": "www.zjzwfw.gov.cn",
+      "path": "/",
+      "expires": 1756709577.278,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "arialoadData",
+      "value": "false",
+      "domain": ".zjzwfw.gov.cn",
+      "path": "/",
+      "expires": 1754203978,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "None"
+    },
+    {
+      "name": "cna",
+      "value": "yaMUIRzL8F4CAf/////Zr/Lg",
+      "domain": ".zjzwfw.gov.cn",
+      "path": "/",
+      "expires": 2384837578,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "None"
+    },
+    {
+      "name": "SERVERID",
+      "value": "adaee8d938c7c78378d7d6b0ebfd698f|1754117597|1754117578",
+      "domain": "alog.zjzwfw.gov.cn",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "None"
+    },
+    {
+      "name": "SSO_TOKEN",
+      "value": "A6485B5F758DC05DE3F47AD946BEFF795AE08335839153741AB252CA24E5B7F2B82C570759ABFC88B968B4CBF3F6A406",
+      "domain": ".zjzwfw.gov.cn",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "None"
+    },
+    {
+      "name": "zjzwfwlogin",
+      "value": "zjzw25713311",
+      "domain": ".zjzwfw.gov.cn",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "None"
+    },
+    {
+      "name": "C_zj_gsid",
+      "value": "nuc-session-pc-bab98e8ce0de415b91cf7118a3807f59",
+      "domain": ".zjzwfw.gov.cn",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "C_zj_platform",
+      "value": "h5",
+      "domain": ".zjzwfw.gov.cn",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "C_zj_accountType",
+      "value": "person",
+      "domain": ".zjzwfw.gov.cn",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "ssxmod_itna",
+      "value": "iq+x9D0Dg7GQ0=GOYDX8DHiyKplDcWBZxtDGq5rni5DsTWDSxGKidDqxBeaZo4p+5KKlirLNY+nEhoe6zn0oxIth3ZTmF=KAWoGLDmKDy+0hPGGDDH8DjxAQDGDBYDixAfFfk55ib+xQ9PFQGFjluNsn+3e7+4qmniFD2wt8RqVeh4sAGoeebq3a2Naex1eGiPIYEDD=",
+      "domain": ".zjzwfw.gov.cn",
+      "path": "/",
+      "expires": 1769669575,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "None"
+    },
+    {
+      "name": "ssxmod_itna2",
+      "value": "iq+x9D0Dg7GQ0=GOYDX8DHiyKplDcWBZxtDGq5rnDikjN=sDlZGlDj4x4R=fEQGFYlgFezr8emGEk=7U37qziU1bOmC3UO7Gb6KXZGii6=YWniijet5o+R6PTU/BQ+e=3kiuz3mcid938jh380VYRDg/ML+zujktfLaUxYjGR63yqoO/Ah3kMxZ/eANuLxbkLd1+lINlwEEiALNggwnD45jKGThYRnyeSjwb4A7NWYiXrxrx8NG0dBuCUf+sF2NKwSb1QAvNkDelURdq/g1dIWTvogm=iMWrTKzIbhsWx5zK7D9oDiH1p4+0Niat0uf9qLtPD1ulQWebuOeeVGu8UpbWnT0PLQpBjWL+iu0+6n9n8ukAHT80klyv9mxSHxE9eFEqgxx7G=kR5iOLlWH9uvlnqS+FWWxmxFDIQtShW8aKuz9mBYRIIeqM4r/b80hG8Yr0xXmrhlirUy=xyZYbhK0C7YhQWYKka3+s/nHKuvWWeIhzMwqP8NNu5lBvQaHUOai0Nnbakki7RvnhxWGsFMpec8eSZtqaGbHklQbYFmGqccNbKTzCR8qlzAnDOouhL0pF8Qf2wOdlRQk8t4q34o7xDKdmXkjyC5r/xSSx5HiS72=hghxgg75M66hOF+qS7XY8yqFXR5cebm=u8jvhla2lPOlDNxQ2s7HZdd/bHPD7=DYKagEA=qzGs7Djeerq+bq7D++xercivY8EH4l5+yP64Cps7eE2PO4/h7A5dhDD",
+      "domain": ".zjzwfw.gov.cn",
+      "path": "/",
+      "expires": 1769669575,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "None"
+    },
+    {
+      "name": "SESSION",
+      "value": "core-server-1813-9c31f33f-243a-4b4b-b4a6-f5c8b8306cd3-1754117611250",
+      "domain": "login.gjzwfw.gov.cn",
+      "path": "/tacs-uc/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "None"
+    },
+    {
+      "name": "Stauthorization",
+      "value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJrM2lzQCRkc281XiZBOEZIKkRGSSIsImF1ZCI6ImNsdyIsImlhdCI6MTc1NDExNzU5MCwibmJmIjoxNzU0MTE3NTkwLCJleHAiOjE3NTQxMjQ3OTAsImRhdGEiOnsic3R1ZGVudGlkIjoiNTgyMzcwIn19.69K_ABZBEW9F63sjgXoBE1Cnt5S7f9JfQepzvY9v_Ds",
+      "domain": "learning.hzrs.hangzhou.gov.cn",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "None"
+    },
+    {
+      "name": "BIGipServerxgx_web_pool",
+      "value": "!yw0davhtOQwRVL0BpN3lutBoukYbQ0Mm3Wn9R90z5QHR6fcR3ZcIO7CZLsVWFm31C4/+gTfJzE8Q",
+      "domain": "learning.hzrs.hangzhou.gov.cn",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "HZSRHANGZHOU",
+      "value": "159edfcc861e2aa355ef17fbb2c54401",
+      "domain": "learning.hzrs.hangzhou.gov.cn",
+      "path": "/",
+      "expires": 1754119059.748,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "None"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "https://learning.hzrs.hangzhou.gov.cn",
+      "localStorage": [
+        {
+          "name": "goprofile",
+          "value": "false"
+        },
+        {
+          "name": "front_token",
+          "value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJrM2lzQCRkc281XiZBOEZIKkRGSSIsImF1ZCI6ImNsdyIsImlhdCI6MTc1NDExNzU5MCwibmJmIjoxNzU0MTE3NTkwLCJleHAiOjE3NTQxMjQ3OTAsImRhdGEiOnsic3R1ZGVudGlkIjoiNTgyMzcwIn19.69K_ABZBEW9F63sjgXoBE1Cnt5S7f9JfQepzvY9v_Ds"
+        },
+        {
+          "name": "use_info",
+          "value": "{\"studentname\":\"蔡志华\",\"isManage\":0}"
+        }
+      ]
+    },
+    {
+      "origin": "https://user.zjzwfw.gov.cn",
+      "localStorage": [
+        {
+          "name": "user_device_id",
+          "value": "1a8b24eadd5be9fc157382bd54234ce1"
+        },
+        {
+          "name": "aria",
+          "value": "{\"803fb4ee1d783770263aa1afd21bfb12\":{\"runtime\":{\"appid\":\"803fb4ee1d783770263aa1afd21bfb12\",\"serviceUrl\":\"https://wza.zj.gov.cn\",\"fileUrl\":\"https://wza.zj.gov.cn\",\"cssServerUrl\":\"https://service.govwza.cn\",\"security\":{\"timestamp\":1754117577684,\"appid\":\"803fb4ee1d783770263aa1afd21bfb12\",\"domain\":\"user.zjzwfw.gov.cn\"}},\"road\":\"https://wza.zj.gov.cn/dist/\"}}"
+        },
+        {
+          "name": "__ETAG__CNA__ID__",
+          "value": "20250802_yaMUIRzL8F4CAf%2F%2F%2F%2F%2FZr%2FLg"
+        }
+      ]
+    }
+  ]
+}
