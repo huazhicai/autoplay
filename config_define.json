@@ -1,10 +1,7 @@
 {
   "headless": false,
-  "course_type": "行业公需",
-  "current_courseid": null,
-  "current_coursename": null,
-  "current_page": 1,
-  "current_course": "https://learning.hzrs.hangzhou.gov.cn/course/index.php?act=detail&courseid=64954",
-  "learning": "!8Qw+qsM6dznRPcJlArjSxGGwuW5rG36EmHZ6Vu/uY6Mlcbvfcb0wQi6V6M9WKD8ujLOQNNJrnYxRFA==",
-  "SESSID": "m6epvepj8e79lhpkpi779oc5u1"
+  "course_type": "专业课程",
+  "current_course_id": "39344",
+  "current_course_name": "新形势下加强基础研究的重点举措（上）",
+  "current_page": 10
 }

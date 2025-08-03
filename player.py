@@ -1,241 +1,116 @@
 # -*- coding:utf-8 -*-
-import time
-import warnings
+import json
 
-warnings.filterwarnings("ignore", category=DeprecationWarning)
+from playwright.sync_api import BrowserContext, sync_playwright
 
-from datetime import datetime, timedelta
-from lxml.etree import HTML
-from selenium.common.exceptions import UnexpectedAlertPresentException, TimeoutException, NoSuchWindowException
+from course import Course, log
 
-from page_obj import PageObject
-from utils import load_json, cookies_variable, save_json
-
-DISPLAY_BLOCK = 'display: block'
-FINISH = object()
-COURSE_TYPE = {'所有': 'all', '专业课程': 15, '行业公需': 16, '一般公需': 17}
+COURSE_TYPE = {'所有': 'all', '专业课程': "15", '行业公需': "16", '一般公需': "17"}
 
 
 class Player(object):
-    def __init__(self):
-        super().__init__()
-        self.config = load_json('./config_define.json')
-        self.type_num = COURSE_TYPE[self.config.get('course_type')]
-        self.current_page = 1
-        self.base_url = 'https://learning.hzrs.hangzhou.gov.cn/course/index.php?offset={}&ckeywords=%E8%AF%B7%E8%BE%93%E5%85%A5%E5%85%B3%E9%94%AE%E5%AD%97%E6%9F%A5%E8%AF%A2&examtype=W&coursetype={}&'
-        cookies = self.load_cookies()
-        self.browser = PageObject(self.base_url.format(self.current_page, self.type_num), cookies, self.config['headless'])
+    def __init__(self, config_path='./config_define.json'):
+        self.config_path = config_path
+        self.config = self.load_config()
+        self.headless = self.config.get('headless', False)
+        self.current_page = self.config.get('current_page', 1)
+        self.course_type = self.config['course_type']
+        self.current_course_id = self.config.get('current_course_id')
 
-        self.course_urls = self.get_current_page_courses_link()
+        self.last_page = 10
+        self.course_list: list[Course] = []
+        self.is_start_page = True
 
-    def load_cookies(self):
-        for cookie in cookies_variable:
-            if cookie['name'] == 'learning':
-                cookie['value'] = self.config['learning']
-            if cookie['name'] == 'SESSID':
-                cookie['value'] = self.config['SESSID']
-        return cookies_variable
+    def load_config(self):
+        with open(self.config_path, 'r', encoding="utf8") as f:
+            return json.load(f)
 
-    def next_page(self):
-        self.current_page = self.current_page + 1
-        self.browser.get(self.base_url.format(self.current_page, self.type_num))
+    def save_config(self):
+        self.config['current_course_id'] = self.current_course_id
+        self.config['current_course_name'] = self.current_course_name
+        self.config['current_page'] = self.current_page
 
-    def get_current_page_courses_link(self):
-        links = self.browser.browser.find_elements_by_xpath('//div[@class="all-course"]/ul/li/a')
-        urls = [link.get_attribute('href') for link in links]
-        return urls
+        with open(self.config_path, 'w', encoding="utf8") as f:
+            json.dump(self.config, f, indent=2, ensure_ascii=False)
 
-    def get_play_course_url(self):
-        if len(self.course_urls) == 0:
-            self.next_page()
-            self.course_urls = self.get_current_page_courses_link()
-            if len(self.course_urls) == 0:
-                return None
-        return self.course_urls.pop(0)
-
-    def skip_time(self):
-        from datetime import datetime, time as tt
-
-        now = datetime.now().time()
-        start_time = tt(9, 0)  # 设置开始时间为8点
-        end_time = tt(21, 0)
-
-        while now < start_time or now > end_time:
-            print('waiting...')
-            time.sleep(400)
-            self.browser.browser.refresh()
-            now = datetime.now().time()
-
-    def play_course(self, link):
-        print(f'course：{link}')
-        self.config['current_course'] = link
-        save_json(self.config, './config_define.json')
-        self.browser.browser.set_page_load_timeout(6)
+    def fetch_courses(self, context: BrowserContext):
         try:
-            self.browser.get(link)
-        except TimeoutException:
-            self.browser.execute_script("window.stop()")
-        time.sleep(1)
-        # self.skip_time()
+            response = context.request.post(
+                "https://learning.hzrs.hangzhou.gov.cn/api/index/index/SelectCourse",
+                data=json.dumps({"type": COURSE_TYPE[self.course_type], "limit": 30, "page": self.current_page}),
+                headers={"Content-Type": "application/json"}
+            )
+            if not response.ok:
+                log.error(f"❌ API 请求失败: {response.status} {response.text()}")
+                return False
 
-        # click = self.browser.browser.find_element_by_xpath('//div[@class="c btnPos"]/button[1]')
-        # click.click()
-        self.browser.click('//div[@class="c btnPos"]/button[1]')
-        self.browser.browser.switch_to_window(self.browser.window_handles[-1])
-        self.current_time = "00:00:00"
-        self.browser.browser.set_page_load_timeout(60)
-        self.monitor_play_page()
+            data = response.json()
+            if "course" not in data:
+                log.error("❌ 响应中缺少 'course' 字段; 可能是auth失效")
+                return False
 
-    def switch_to_frame(self):
-        self.browser.switch_to_frame('/html/frameset/frame')
+            data = response.json()['course']
+            self.last_page = data.get('last_page', 10)
 
-    def play_page_1(self):
-        if self.finish():
-            return FINISH
+            self.course_list = [Course(item['courseid'], item['coursename']) for item in data['data']]
 
-        media = self.browser.locate_ele('//*[@id="media1_jwplayer_display_icon"]')
-        if not media: return
-        style = media.get_attribute('style')
-        if style and DISPLAY_BLOCK in style:
-            self.browser.click('//*[@id="mediaMaskBg"]')  # play
-            self.browser.click('//*[@id="mediaMask"]')  # play
+            # 断点续播：仅在开始页时过滤
+            if self.is_start_page and self.current_course_id:
+                self.course_list = self._filter_unwatched(self.course_list, self.current_course_id)
 
-    def play_page_2(self):
-        if self.finish():
-            return FINISH
+            self.is_start_page = False
+            return True
+        except Exception as e:
+            log.error(f"❌ 获取课程列表失败: {str(e)}", exc_info=True)
+            return False
 
-        media = self.browser.locate_ele('//div[@data-title="点击播放"]')
-        if not media: return
-        style = media.get_attribute('style')
-        if style and DISPLAY_BLOCK in style:
-            self.browser.click('//*[@id="timePanel"]')  # anchor
-            self.browser.execute_script("arguments[0].click();", media)
+    def _filter_unwatched(self, courses: list[Course], start_id: str):
+        """断点续播，过滤当前页面已经播发的课程"""
+        for i, course in enumerate(courses):
+            if course.id == start_id:
+                return courses[i:]
+        return courses
 
-    def play_page_3(self):
-        self.browser.click('//*[@id="footer"]')  # anchor
-        current_time = self.browser.execute_script('return document.getElementById("myVideo").currentTime;')
-        total_time = self.browser.execute_script('return document.getElementById("myVideo").duration;')
-        if current_time == total_time:
-            return FINISH
+    def play_all_courses(self, context: BrowserContext):
+        for course in self.course_list:
+            self.current_course_id = course.id
+            self.current_course_name = course.name
+            self.save_config()
+            course.play(context.new_page())
 
-        time.sleep(1)
-        current_time_2 = self.browser.execute_script('return document.getElementById("myVideo").currentTime;')
-        if current_time == current_time_2:
-            self.browser.execute_script('document.getElementById("myVideo").play()')
-
-    def play_page_4(self):
-        if self.finish():
-            return FINISH
-
-        media = self.browser.locate_ele('//*[@id="toPlay"]')
-        if not media: return
-        style = media.get_attribute('style')
-        if style and DISPLAY_BLOCK in style:
-            media.click()
-        elif not style:
-            media.click()
-
-    def play_page_5(self):
-        try:
-            if self.finish():
-                return FINISH
-
-            media = self.browser.locate_ele('//*[@id="media1_jwplayer_display_iconBackground"]')
-            media_2 = self.browser.locate_ele('//*[@id="media1_jwplayer_display_text"]')
-            if not (media or media_2): return
-            style = media.get_attribute('style')
-            style_2 = media_2.get_attribute('style')
-            if (style and DISPLAY_BLOCK in style) or (style_2 and DISPLAY_BLOCK in style_2):
-                self.browser.click('//*[@id="mediaMask"]')  # play
-        except UnexpectedAlertPresentException:
-            self.browser.switch_to_alert_accept()
-
-    def get_current_play_page(self, retry=None):
-        self.browser.locate_ele_long('//body')
-        doc = HTML(self.browser.page_source)
-        page_5 = doc.xpath('//*[@id="mediaMask"]')
-        if page_5:
-            print('play_page_5')
-            return self.play_page_5
-        page_1 = doc.xpath('//*[@id="media1_jwplayer_display_icon"]')  # 暂停的页面
-        if page_1:
-            print('play_page_1')
-            return self.play_page_1
-        page_2 = doc.xpath('//*[@id="timePanel"]')
-        if page_2:
-            print('play_page_2')
-            return self.play_page_2
-        page_3 = doc.xpath('//*[@id="myVideo"]')  # 调用js播放的页面
-        if page_3:
-            print('play_page_3')
-            return self.play_page_3
-        page_4 = doc.xpath('//*[@id="nextButton"]')
-        # page_4 = doc.xpath('//*[@id="toPause"]')
-        if page_4:
-            print('play_page_4')
-            return self.play_page_4
-        if not retry:
-            return self.get_current_play_page(retry=1)
-        print("Can't locate the play page")
-
-    def finish(self):
-        current_time = self.browser.locate_ele('//*[@id="currentTimeLabel"]')
-        total_time = self.browser.locate_ele('//*[@id="totalTimeLabel"]')
-        if current_time and total_time:
-            current_time = current_time.text
-            if not current_time:
-                doc = HTML(self.browser.page_source)
-                current_time = ''.join(doc.xpath('//*[@id="currentTimeLabel"]/text()')).strip()
-            if current_time >= total_time.text:
-                return True
-            if current_time and self.current_time:
-                if datetime.strptime(current_time, '%H:%M:%S') + timedelta(minutes=2) < datetime.strptime(
-                        self.current_time, '%H:%M:%S'):
-                    return True
-                self.current_time = current_time
-
-    def monitor_play_page(self):
-        open_frame = None
-        current_page_func = None
-        while True:
-            time.sleep(3)
-            try:
-                if not open_frame:
-                    self.switch_to_frame()
-                    open_frame = True
-                if not current_page_func:
-                    current_page_func = self.get_current_play_page()
-                if current_page_func() is FINISH:
-                    break
-            except AttributeError:
-                self.browser.switch_to_alert_accept()
-            except UnexpectedAlertPresentException:
-                self.browser.switch_to_alert_accept()
-            except NoSuchWindowException:
-                break
-            except TypeError as e:
-                print(e)
-                self.browser.switch_to_alert_accept()
-            except TimeoutException as e:
-                print(e)
-                self.browser.switch_to_alert_accept()
-        self.browser.browser.switch_to_window(self.browser.window_handles[0])
+    def login(self, page):
+        page.goto("https://learning.hzrs.hangzhou.gov.cn/#/")
+        page.get_by_role("button", name="学员登录").click()
+        page.get_by_text("在线学习系统").click()
+        page.get_by_text("网络课程").first.click()
+        page.click("div.el-select__placeholder:has-text('--所有--')")
+        page.click(f"li:has-text(\'{self.course_type}\')")
+        page.get_by_role("button", name="查询").click()
+        return page
 
     def run(self):
-        flag = False
-        current_course_url = self.config.get('current_course')
-        play_url = self.get_play_course_url()
-        while play_url:
-            if not current_course_url:
-                self.play_course(play_url)
-            elif current_course_url == play_url:
-                self.play_course(play_url)
-                flag = True
-            elif flag:
-                self.play_course(play_url)
-            play_url = self.get_play_course_url()
+        with sync_playwright() as p:
+            browser = p.firefox.launch(headless=self.headless, args=["--start-maximized"], slow_mo=100)
+            context = browser.new_context(storage_state="auth.json", viewport={"width": 1920, "height": 1080})
+
+            page = context.new_page()
+            try:
+                self.login(page)
+            except Exception:
+                page.reload()
+                self.login(page)
+
+            while self.current_page <= self.last_page:
+                self.fetch_courses(context)
+                self.play_all_courses(context)
+                self.current_page += 1
+                break
+
+            input('anything....')
+            page.close()
+            browser.close()
 
 
 if __name__ == '__main__':
-    play = Player()
-    play.run()
+    player = Player()
+    player.run()
