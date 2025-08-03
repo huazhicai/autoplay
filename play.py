@@ -218,6 +218,7 @@ class Page(object):
             last_page = self.get_last_page(page)
             page.on('response', self.on_response)
 
+            current_page = 1
             while current_page <= 8:
                 try:
                     self.play_current_page_courses(context)
