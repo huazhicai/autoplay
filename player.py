@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 import json
-
+import logging
 from playwright.sync_api import BrowserContext, sync_playwright
 
 from course import Course, log
@@ -41,12 +41,12 @@ class Player(object):
                 headers={"Content-Type": "application/json"}
             )
             if not response.ok:
-                log.error(f"❌ API 请求失败: {response.status} {response.text()}")
+                log.error(f"API 请求失败: {response.status} {response.text()}")
                 return False
 
             data = response.json()
             if "course" not in data:
-                log.error("❌ 响应中缺少 'course' 字段; 可能是auth失效")
+                log.error("响应中缺少 'course' 字段; 可能是auth失效")
                 return False
 
             data = response.json()['course']
@@ -61,7 +61,7 @@ class Player(object):
             self.is_start_page = False
             return True
         except Exception as e:
-            log.error(f"❌ 获取课程列表失败: {str(e)}", exc_info=True)
+            log.error(f"获取课程列表失败: {str(e)}", exc_info=True)
             return False
 
     def _filter_unwatched(self, courses: list[Course], start_id: str):
@@ -104,7 +104,7 @@ class Player(object):
                 self.fetch_courses(context)
                 self.play_all_courses(context)
                 self.current_page += 1
-                break
+                # break
 
             input('anything....')
             page.close()
