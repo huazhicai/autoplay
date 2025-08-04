@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 import json
+import sys
 from playwright.sync_api import BrowserContext, sync_playwright
 
 from course import Course, log
@@ -96,8 +97,9 @@ class Player(object):
             try:
                 self.login(page)
             except Exception:
-                page.reload()
-                self.login(page)
+                if page.get_by_role("textbox", name="请输入手机号/用户名/居民身份证号").count()>0:
+                    log.warning('auth.json 文件失效，请执行manual_login.py，获取auth')
+                    sys.exit(0)
 
             while self.current_page <= self.last_page:
                 self.fetch_courses(context)
@@ -105,11 +107,11 @@ class Player(object):
                 self.current_page += 1
                 # break
 
-            input('anything....')
             page.close()
             browser.close()
+            log.info('课程播放完')
 
 
-if __name__ == '__main__':
-    player = Player()
-    player.run()
+# if __name__ == '__main__':
+#     player = Player()
+#     player.run()

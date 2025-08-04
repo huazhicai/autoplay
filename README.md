@@ -1,18 +1,13 @@
-# autoPlay
+### autoPlay
 
-### # 谷歌驱动下载: http://npm.taobao.org/mirrors/chromedriver/
-### selenium==3.141.0
+pip install playwright==1.54.0 
+playwright install  # 安装驱动
 
-### 职业教育网站课程自动播发
+执行manual_login.py，手动登录后脚本会自动保存登录状态 
+手动输入图片验证码和手机验证码
+注意： 如果图片拖拽验证无法成功，直接X掉；
+无法收到手机验证码，可以手动打开浏览器，收到验证码后，再填入脚本打开的浏览器
 
-### 监控播放网页
 
-##### page_1: 
-##### page_2: 
-    - https://learning.hzrs.hangzhou.gov.cn/course/index.php?act=detail&courseid=53588
-##### page_3: 
-##### page_4: 
-    - https://learning.hzrs.hangzhou.gov.cn/course/index.php?act=detail&courseid=53055
-##### page_5:
-    - https://learning.hzrs.hangzhou.gov.cn/course/index.php?act=detail&courseid=37947
-    - https://learning.hzrs.hangzhou.gov.cn/course/index.php?act=detail&courseid=39422 # autoplay
+config_define.json 中course_type 是必填项目  [ “专业课程”  “行业公需” “一般公需”] 填一个 
+
