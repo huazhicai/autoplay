@@ -93,7 +93,7 @@ class Course:
         page.on("dialog", lambda dialog: dialog.accept())  # 自动接受所有弹窗
 
         try:
-            page.wait_for_load_state('networkidle', timeout=5000)
+            page.wait_for_load_state('networkidle', timeout=10000)
         except TimeoutError:
             log.warning("页面加载超时，但仍继续执行...")
 
@@ -104,13 +104,16 @@ class Course:
             frame = page.frame_locator('iframe').frame_locator('iframe[name="course"]')
             if frame.locator("#currentPageLabel").count() > 0:
                 self.monitor_15_2(page)
-            else:
+            elif frame.locator("#initPanel").count() > 0:
                 self.monitor_15_3(page)
+            else:
+                log.warning('未识别到监控选择器，查看debug_screenshot1.png')
+                page.screenshot(path="debug_screenshot.png")  # 截图辅助调试
 
         page.close()
 
     def monitor_15_1(self, page: Page):
-        log.debug("检测到模式 15.1：无 iframe 结构")
+        log.info("检测到模式 15.1 监控")
 
         # 尝试点击“继续学习”弹窗
         self._handle_dialog_button(page, "确定", timeout=2000)
@@ -122,7 +125,8 @@ class Course:
             play_button.click()
             log.info("已点击播放按钮")
         except TimeoutError:
-            log.warning("未找到播放按钮，可能已自动播放")
+            page.screenshot(path="debug_screenshot1.png")  # 截图辅助调试
+            log.warning("1、未找到播放按钮，可以尝试手动点击播放")
 
         # 播放控制按钮（VJS 播放器）
         play_control = page.locator('button.vjs-play-control')
@@ -147,16 +151,19 @@ class Course:
                 log.debug(f"监控播放状态异常: {str(e)}")
 
     def monitor_15_2(self, page: Page):
+        log.info("检测到模式 15.2 监控")
         frame = page.frame_locator('iframe').frame_locator('iframe[name="course"]')
         try:
             frame.locator('#nextButton').click()
             page.wait_for_timeout(5000)
             frame.locator('#previousButton').click()
+            log.info("已点击播放按钮")
         except Exception as e:
             frame.locator("#mediaMaskBg").click()
             page.wait_for_timeout(5000)
             frame.locator("#mediaMaskBg").click()
-
+            page.screenshot(path="debug_screenshot2.png")  # 截图辅助调试
+            log.warning("2、自动播发失败，可以尝试手动点击播放")
 
         total_watch_time = 60 * 60 * 1000  # 60分钟
         start_time = time.time() * 1000
@@ -175,14 +182,20 @@ class Course:
                         break
                     frame.locator('#nextButton').click()
             except Exception as e:
-                log.error(f"监控过程中发生异常: {str(e)}")
+                log.debug(f"监控过程中发生异常: {str(e)}")
 
             page.wait_for_timeout(1000)
 
     def monitor_15_3(self, page: Page):
+        log.info("检测到模式 15.3 监控")
         frame = page.frame_locator('iframe').frame_locator('iframe[name="course"]')
-        frame.locator('#mediaMask').click()  # 恢复秩序
-        frame.locator('#mediaMask').click()  # 开始播放
+        try:
+            frame.locator('#mediaMask').click()  # 恢复秩序
+            frame.locator('#mediaMask').click()  # 开始播放
+            log.info("已点击播放按钮")
+        except Exception as e:
+            log.warning('点击播放失败，请手动点击开始观看')
+            page.screenshot(path="debug_screenshot3.png")  # 截图辅助调试
 
         total_watch_time = 60 * 60 * 1000  # 60分钟
         start_time = time.time() * 1000

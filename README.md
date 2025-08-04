@@ -11,3 +11,8 @@ playwright install  # 安装驱动
 
 config_define.json 中course_type 是必填项目  [ “专业课程”  “行业公需” “一般公需”] 填一个 
 
+如果想从哪个课程开始播放，就填入该课程的 current_course_id 和 current_page
+
+
+程序主入口：main.py 
+
