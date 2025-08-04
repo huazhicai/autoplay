@@ -148,9 +148,15 @@ class Course:
 
     def monitor_15_2(self, page: Page):
         frame = page.frame_locator('iframe').frame_locator('iframe[name="course"]')
-        frame.locator('#nextButton').click()
-        page.wait_for_timeout(5000)
-        frame.locator('#previousButton').click()
+        try:
+            frame.locator('#nextButton').click()
+            page.wait_for_timeout(5000)
+            frame.locator('#previousButton').click()
+        except Exception as e:
+            frame.locator("#mediaMaskBg").click()
+            page.wait_for_timeout(5000)
+            frame.locator("#mediaMaskBg").click()
+
 
         total_watch_time = 60 * 60 * 1000  # 60分钟
         start_time = time.time() * 1000

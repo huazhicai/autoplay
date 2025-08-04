@@ -1,6 +1,5 @@
 # -*- coding:utf-8 -*-
 import json
-import logging
 from playwright.sync_api import BrowserContext, sync_playwright
 
 from course import Course, log
