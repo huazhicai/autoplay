@@ -86,6 +86,26 @@ class Course:
             log.debug("获取总时长超时")
             return None
 
+    def select_monitor(self, page):
+        try:
+            # 判断是否包含 iframe（区分版本 15.1 / 15.2.3）
+            if page.locator('#hls_html5_api').count() > 0:
+                self.monitor_15_1(page)
+            else:
+                frame = page.frame_locator('iframe').frame_locator('iframe[name="course"]')
+                if frame.locator("#currentPageLabel").count() > 0:
+                    self.monitor_15_2(page)
+                elif frame.locator("#initPanel").count() > 0:
+                    self.monitor_15_3(page)
+                else:
+                    log.warning('未识别到监控选择器，查看debug_screenshot.png')
+                    page.screenshot(path="debug_screenshot.png")  # 截图辅助调试
+            return True
+        except Exception as e:
+            page.screenshot(path="debug_screenshot.png")  # 截图辅助调试
+            log.warning(f'select_monitor failed: {str(e)}')
+            return False
+
     def play(self, page: Page):
         url = f"https://learning.hzrs.hangzhou.gov.cn/#/class?courseId={self.id}&coursetitle={self.name}"
         log.info(url)
@@ -93,22 +113,15 @@ class Course:
         page.on("dialog", lambda dialog: dialog.accept())  # 自动接受所有弹窗
 
         try:
-            page.wait_for_load_state('networkidle', timeout=10000)
+            page.wait_for_load_state('networkidle')
         except TimeoutError:
             log.warning("页面加载超时，但仍继续执行...")
 
-        # 判断是否包含 iframe（区分版本 15.1 / 15.2.3）
-        if page.locator('#hls_html5_api').count() > 0:
-            self.monitor_15_1(page)
-        else:
-            frame = page.frame_locator('iframe').frame_locator('iframe[name="course"]')
-            if frame.locator("#currentPageLabel").count() > 0:
-                self.monitor_15_2(page)
-            elif frame.locator("#initPanel").count() > 0:
-                self.monitor_15_3(page)
-            else:
-                log.warning('未识别到监控选择器，查看debug_screenshot1.png')
-                page.screenshot(path="debug_screenshot.png")  # 截图辅助调试
+        if not self.select_monitor(page):
+            page.reload()  # 页面卡死，刷新
+            page.wait_for_timeout(10000)
+            if not self.select_monitor(page):
+                log.warning(f'页面加载失败，播放下一个视频')
 
         page.close()
 
@@ -126,7 +139,7 @@ class Course:
             log.info("已点击播放按钮")
         except TimeoutError:
             page.screenshot(path="debug_screenshot1.png")  # 截图辅助调试
-            log.warning("1、未找到播放按钮，可以尝试手动点击播放")
+            log.warning("1、未找到播放按钮 debug_screenshot1.png，可以尝试手动点击播放")
 
         # 播放控制按钮（VJS 播放器）
         play_control = page.locator('button.vjs-play-control')
@@ -163,7 +176,7 @@ class Course:
             page.wait_for_timeout(5000)
             frame.locator("#mediaMaskBg").click()
             page.screenshot(path="debug_screenshot2.png")  # 截图辅助调试
-            log.warning("2、自动播发失败，可以尝试手动点击播放")
+            log.warning("2、自动播放失败 debug_screenshot2.png，可以尝试手动点击播放")
 
         total_watch_time = 60 * 60 * 1000  # 60分钟
         start_time = time.time() * 1000
@@ -179,12 +192,12 @@ class Course:
                 if paused_2:
                     if current_page_label == total_page_label:
                         page.wait_for_timeout(2 * 60 * 1000)
+                        log.info("视频播放完毕，退出循环")
                         break
                     frame.locator('#nextButton').click()
+                    log.info("检测到暂停，点击继续播放")
             except Exception as e:
                 log.debug(f"监控过程中发生异常: {str(e)}")
-
-            page.wait_for_timeout(1000)
 
     def monitor_15_3(self, page: Page):
         log.info("检测到模式 15.3 监控")
@@ -194,7 +207,7 @@ class Course:
             frame.locator('#mediaMask').click()  # 开始播放
             log.info("已点击播放按钮")
         except Exception as e:
-            log.warning('点击播放失败，请手动点击开始观看')
+            log.warning('点击播放失败 debug_screenshot3.png，请手动点击开始观看')
             page.screenshot(path="debug_screenshot3.png")  # 截图辅助调试
 
         total_watch_time = 60 * 60 * 1000  # 60分钟
@@ -209,15 +222,15 @@ class Course:
                 total_time_str = self.get_total_time(frame)
 
                 if current_time_str == total_time_str:
+                    log.info("视频播放完毕，退出循环")
                     break
 
                 if self.is_paused(frame):
                     frame.locator("#toPlay").click(timeout=3000)
+                    log.info("检测到暂停，点击继续播放")
 
             except Exception as e:
                 log.error(f"监控过程中发生异常: {str(e)}")
-
-            page.wait_for_timeout(1000)
 
     def _handle_dialog_button(self, page, button_text: str, timeout: int = 3000):
         """通用处理弹窗按钮"""
