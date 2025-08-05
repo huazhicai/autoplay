@@ -167,6 +167,7 @@ class Course:
         log.info("检测到模式 15.2 监控")
         frame = page.frame_locator('iframe').frame_locator('iframe[name="course"]')
         try:
+            self._handle_dialog_button(page, "确定", timeout=1000)
             frame.locator('#nextButton').click()
             page.wait_for_timeout(5000)
             frame.locator('#previousButton').click()
@@ -203,6 +204,7 @@ class Course:
         log.info("检测到模式 15.3 监控")
         frame = page.frame_locator('iframe').frame_locator('iframe[name="course"]')
         try:
+            self._handle_dialog_button(page, "确定", timeout=1000)
             frame.locator('#mediaMask').click()  # 恢复秩序
             frame.locator('#mediaMask').click()  # 开始播放
             log.info("已点击播放按钮")
